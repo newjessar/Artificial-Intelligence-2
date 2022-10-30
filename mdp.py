@@ -1,8 +1,10 @@
 ### code for representing/solving an MDP
 
-import random
+import random as rd
 import numpy as np
 import numpy
+numpy.warnings.filterwarnings('ignore')
+np.warnings.filterwarnings('ignore')
 from problem_utils import *
 
 class State :
@@ -48,10 +50,9 @@ class Map :
         
         ### 1. initialize utilities to 0
         for s in self.states.values() :
-            
             ## Exclude the goal state
             if not (s.isGoal == True):
-                pass
+                s.utility = 0.0
             
         while(True):
             ## count the process
@@ -79,10 +80,55 @@ class Map :
 
     ### you write this method
     def policyIteration(self) :
+        ## reset every epoch after updating the actual utilities
+        epoch = 0
+        
         ### 1. initialize random policy
-        ### 2 repeat policy iteration loop until policy is stable
-    
-        pass #placeholder, delete when implementing
+        for s in self.states.values() :
+            ## Initiate a random policy
+            if not (s.isGoal == True):
+                s.policy = rd.choice(s.actions)
+                 
+        ### 2 repeat policy iteration loop until policy is stable        
+        while(True):
+            ## count the process
+            epoch +=1
+            
+            ## Calculate the utility linearly of the policy regarding each state 
+            self.calculateUtilitiesLinear()
+            
+            ## monitor the change in the policy
+            policy_differ = False
+            
+            ## Bellmen utility equation
+            for s in self.states.values():
+                current_a = 0.0
+                if s.isGoal:
+                    pass
+                else:
+                    current_a = 0.0
+                    ## Calculate the the current action: U*T of s
+                    for p_s_trans in s.transitions[s.policy]:
+                        current_a += (p_s_trans[0] * p_s_trans[1].utility)
+                        
+                    ## Update the actions
+                    for a in s.actions:
+                        ## possible actions
+                        pro_a = 0
+                        ## Calculate the the possible action: U*T of s'
+                        for p_s_trans in s.transitions[a]:
+                            pro_a += (p_s_trans[0] * p_s_trans[1].utility)
+                        ## Chose the best action
+                        if current_a < pro_a:
+                            current_a = pro_a
+                            s.policy = a
+                            policy_differ = True
+                            
+            ## Break the iteration after the optioning the new policy                                 
+            if policy_differ == False:
+                print(epoch)
+                break        
+
     
     def calculateUtilitiesLinear(self) :
         n_states = len(self.states)
