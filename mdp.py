@@ -57,7 +57,7 @@ class Map :
             ## count the process
             epoch +=1
             # monitor the change in the utilities
-            max_utility_diff, old_util = 0.0
+            max_utility_diff, old_util = 0.0, 0.0
             ## Bellmen utility equation
             for s in self.states.values():
                 if s.isGoal:
