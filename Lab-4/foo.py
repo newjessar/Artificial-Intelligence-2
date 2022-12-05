@@ -7,10 +7,13 @@ while(True):
             m1 = mdp.makeRNProblem()
             m1.valueIteration()
             m1.printValues()
+            m1.printActions()
+
         else:
             if (n == "2"):
                 m2 = mdp.makeRNProblem()
                 m2.policyIteration()
+                m2.printValues()
                 m2.printActions()
     
     elif (i == "2"):        
@@ -19,10 +22,12 @@ while(True):
                 m1 = mdp.make2DProblem()
                 m1.valueIteration()
                 m1.printValues()
+                m1.printActions()
             else:
                 if (n == "2"):
                     m2 = mdp.make2DProblem()
                     m2.policyIteration()
+                    m2.printValues()
                     m2.printActions()
     else:
         if (i == "3"): 

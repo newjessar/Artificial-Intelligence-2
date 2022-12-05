@@ -3,6 +3,7 @@
 import random as rd
 import numpy as np
 import numpy
+import time
 numpy.warnings.filterwarnings('ignore')
 np.warnings.filterwarnings('ignore')
 from problem_utils import *
@@ -45,9 +46,10 @@ class Map :
 
     ### you write this method
     def valueIteration(self) :
+        start = time.time()
         ## reset every epoch after updating the actual utilities
         epoch = 0
-        
+
         ### 1. initialize utilities to 0
         for s in self.states.values() :
             ## Exclude the goal state
@@ -71,10 +73,12 @@ class Map :
                     ## Get the difference for all states
                     max_utility_diff += abs(s.utility - old_util)
                     
-            ## When the states are less then the stop crit, break
+            ## When the states are less than the stop crit, break
             if self.stop_crit > max_utility_diff:
-                print(epoch)
-                break    
+                print("Epochs:", epoch)
+                end = time.time()
+                print("Time", end - start)
+                break
 
                     
 
@@ -82,7 +86,7 @@ class Map :
     def policyIteration(self) :
         ## reset every epoch after updating the actual utilities
         epoch = 0
-        
+        start = time.time()
         ### 1. initialize random policy
         for s in self.states.values() :
             ## Initiate a random policy
@@ -124,9 +128,11 @@ class Map :
                             s.policy = a
                             policy_differ = True
                             
-            ## Break the iteration after the optioning the new policy                                 
+            ## Break the iteration after optioning the new policy
             if policy_differ == False:
-                print(epoch)
+                print("Epochs:", epoch)
+                end = time.time()
+                print("Time", end - start)
                 break        
 
     
@@ -227,7 +233,6 @@ def makeRNProblem() :
                     
     m.states[(3,0)].isGoal = True
     m.states[(3,1)].isGoal = True
-
     m.states[(3,0)].utility = 1.0
     m.states[(3,1)].utility = -1.0
 
