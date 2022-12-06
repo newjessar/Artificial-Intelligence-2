@@ -142,14 +142,6 @@ class KMeans:
                 return self.clusters[cluster_idx].prototype
             
     def test(self):
-        # iterate along all clients. Assumption: the same clients are in the same order as in the testData
-        # for each client find the cluster of which it is a member
-        # get the actual testData (the vector) of this client
-        # iterate along all dimensions
-        # and count prefetched htmls
-        # count number of hits
-        # count number of requests
-        # set the variables hitrate and accuracy to their appropriate value
             
         ## Total number of html_prefetched amongst all clients
         html_prefetched = 0
