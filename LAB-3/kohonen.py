@@ -1,4 +1,4 @@
-import math
+import random as rd
 
 class Cluster:
     """This class represents the clusters, it contains the
@@ -29,13 +29,20 @@ class Kohonen:
     def euclidean_distance(self, p1, p2):
         return(sum([(a-b)**2 for a, b in zip(p1, p2)]))
 
-    def train(self):
+    def random_initialization(self):
+        for row in range(self.n):
+            for col in range(self.n):
+                for feature in range(self.dim):
+                    value = rd.random()
+                    self.clusters[row][col].prototype[feature] = value
 
-        ## Step 1: Iterate every epoch
+    def train(self):
+        self.random_initialization()
+        ## Step 1: Iterate through every epoch
         for inEpoch in range(self.epochs):      
             ## The radius r of the BMU's neighborhood is calculated
-            r = round((self.n/2)*(1-inEpoch/self.epochs),2)
-            ## Learning rate calculation according to the equation
+            r = (self.n/2)*(1-inEpoch/self.epochs)
+            ## Learning rate calculation according to the given equation
             eTa = (self.initial_learning_rate*(1-inEpoch/self.epochs))
             
             
@@ -45,28 +52,35 @@ class Kohonen:
                 
                 ## Step 3: Find the BMI related to the given vector
                 for clusterRow_IDX, clusterRow in enumerate(self.clusters):
-                    for clusterValue_idx, clusterValue in enumerate(clusterRow):
-                        cluster_diff = self.euclidean_distance(clusterValue.prototype, vInput)
+                    for clusterCol_IDX, clusterCol in enumerate(clusterRow):
+                        cluster_diff = self.euclidean_distance(clusterCol.prototype, vInput)
                         if eucl_dist == None or eucl_dist > cluster_diff:
                             eucl_dist = cluster_diff
-                            bmu_node_idx, bmu_in = clusterRow_IDX, clusterValue_idx 
-                            
-                ## Step 4: Each node in BMU’s neighborhood is adjusted
-                for clusterRow_IDX, clusterRow in enumerate(self.clusters):
-                    if clusterRow_IDX < bmu_node_idx-r or clusterRow_IDX > bmu_node_idx+r:
-                          continue    
+                            bmu_row_idx,bmu_col_idx = clusterRow_IDX, clusterCol_IDX
                     
-                    for nodeValue_idx, nodeValue in enumerate(clusterRow):
-                        if nodeValue_idx < bmu_in-r or nodeValue_idx > bmu_in+r:
-                            continue
-                        
-                        ## Step 5: Update the weights pre_prototype following the equation in the assignment
-                        for idx in range(self.dim):
-                            pre_prototype = nodeValue.prototype[idx]
-                            x = vInput[idx]
-                            nodeValue.prototype[idx] = (((1 - eTa)*pre_prototype)+(eTa*x))
+                ## Step 4: Each node in BMU’s neighborhood is adjusted
+                for clusterRow_IDX, clusterRow in enumerate(self.clusters):                 
+                    for clusterCol_IDX, clusterCol in enumerate(clusterRow):
+                        if self.euclidean_distance(clusterCol.prototype,self.clusters[bmu_row_idx][bmu_col_idx].prototype) < r:
+                            ## Step 5: Update the weights pre_prototype following the equation in the assignment
+                            for idx in range(self.dim):
+                                pre_prototype = clusterCol.prototype[idx]
+                                x = vInput[idx]
+                                clusterCol.prototype[idx] = (((1 - eTa)*pre_prototype)+(eTa*x))
 
-
+    def prototype_index(self,  dataPoint):
+        all_Prototypes = []
+        # Gathering all prototypes and Backup the cluster members  
+        for clusterRow in self.clusters:
+            for cluster in clusterRow:
+                all_Prototypes.append(cluster.prototype)
+        # Calculating the distance for all prototypes to the dataPoint
+        all_Dist_prototypes = [self.euclidean_distance(dataPoint, prototype) 
+                    for prototype in all_Prototypes]
+        # Get the minimum distance between all the K Prototypes
+        nearest_prototype = min(all_Dist_prototypes)
+        nearest_prototype_idx = all_Dist_prototypes.index(nearest_prototype)
+        return self.clusters[int(nearest_prototype_idx//self.n)][int(nearest_prototype_idx%self.n)].prototype
 
     def test(self):
             
@@ -76,15 +90,12 @@ class Kohonen:
         total_requests = 0
         ## Total number of hits amongst all clients
         total_hits = 0
-        prototype = self.clusters[0][0].prototype
 
         ## Iterate to get the clients and a data sample from the testdata
         for testSample in self.testdata:
             ## closest cluster
-            for x in range(self.n):
-                for y in range(self.n):
-                    if self.clusters[x][y].prototype == testSample:
-                        prototype = self.clusters[x][y].prototype
+        
+            prototype = self.prototype_index(testSample)
             ## predicted values
             predict = [(0 if idx < self.prefetch_threshold else 1) for idx in prototype]
             ## sum the entire prefetched to added up
@@ -122,3 +133,4 @@ class Kohonen:
             for j in range(self.n):
                print("Prototype cluster["+str(i)+"]["+str(j)+"] :", self.clusters[i][j].prototype)
                print()
+               

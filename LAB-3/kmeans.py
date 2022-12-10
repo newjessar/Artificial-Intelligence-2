@@ -49,10 +49,26 @@ class KMeans:
         self.hitrate = 0
 
     ## Initial random clusters  
-    def random_initialization(self):
-        for test_data, prototype in enumerate(self.traindata):
+
+    """TODO Fix this each cluster  needs atleast one data point"""
+    def random_initialization22(self):
+        for train_data, prototype in enumerate(self.traindata):
             idx = random.randint(0, self.k-1)
-            self.clusters[idx].add_members(test_data)
+            self.clusters[idx].add_members(train_data)
+            
+    """TODO Fix this each cluster  needs at least one data point"""
+    def random_initialization(self):
+        print(len(self.traindata))
+        for data_IDX, data in enumerate(self.traindata):
+            prototype_IDX = random.randint(0, self.k-1)
+            print(data_IDX)
+            if data_IDX == len(self.traindata)-self.k:
+                for ks in range(self.k-1):
+                    if self.clusters[ks].current_members == set():
+                        self.clusters[prototype_IDX].add_members(data_IDX)
+                    break
+            else:
+                self.clusters[prototype_IDX].add_members(data_IDX)
             
     ## Manage the movement between all the clusters
     def members_movement(self, cluster_idx, dataPoint_idx):
@@ -136,10 +152,18 @@ class KMeans:
         self.print_clusterPart(epoch)
 
     ## Find the closest prototype
-    def prototype_index(self, dataSample_train):  
-        for cluster_idx in range(self.k):
-            if {dataSample_train}.issubset(self.clusters[cluster_idx].current_members):
-                return self.clusters[cluster_idx].prototype
+    def prototype_index(self,  dataPoint):
+        all_Prototypes = []
+        # Gathering all prototypes and Backup the cluster members  
+        for cluster in self.clusters:
+            all_Prototypes.append(cluster.prototype)
+        # Calculating the distance for all prototypes to the dataPoint
+        all_Dist_prototypes = [self.euclidean_distance(dataPoint, prototype) 
+                    for prototype in all_Prototypes]
+        # Get the minimum distance between all the K Prototypes
+        nearest_prototype = min(all_Dist_prototypes)
+        nearest_prototype_idx = all_Dist_prototypes.index(nearest_prototype)
+        return self.clusters[nearest_prototype_idx].prototype
             
     def test(self):
             
@@ -153,7 +177,7 @@ class KMeans:
         ## Iterate to get the clients and a data sample from the testdata
         for client_idx, testSample in enumerate(self.testdata):
             ## closest cluster
-            prototype = self.prototype_index(client_idx)
+            prototype = self.prototype_index(testSample)
             ## predicted values
             predict = [(0 if idx < self.prefetch_threshold else 1) for idx in prototype]
             ## sum the entire prefetched to added up
