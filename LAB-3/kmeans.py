@@ -49,17 +49,9 @@ class KMeans:
         self.hitrate = 0
 
     ## Initial random clusters  
-
-    """TODO Fix this each cluster  needs atleast one data point"""
-    def random_initialization22(self):
-        for train_data, prototype in enumerate(self.traindata):
-            idx = random.randint(0, self.k-1)
-            self.clusters[idx].add_members(train_data)
-            
-    """TODO Fix this each cluster  needs at least one data point"""
     def random_initialization(self):
         print(len(self.traindata))
-        for data_IDX, data in enumerate(self.traindata):
+        for data_IDX in range(len(self.traindata)):
             prototype_IDX = random.randint(0, self.k-1)
             print(data_IDX)
             if data_IDX == len(self.traindata)-self.k:
@@ -112,7 +104,7 @@ class KMeans:
             self.members_movement(nearest_prototype_idx, dataPoint_idx)
 
     ## Calculating the mean value to be assign as a prototype
-    def avrage_cluster(self):
+    def average_cluster(self):
         for cluster in self.clusters:
             # Get the indices of all the members
             member_IDXList = [pt for pt in cluster.current_members]         
@@ -135,9 +127,9 @@ class KMeans:
     def train(self):
         epoch = 0
         # implement k-means algorithm here:
-        # Step 1: Select an initial random pertaining with k clusters
+        # Step 1: Select an initial random pertaining with k clusters 
         self.random_initialization()
-        self.avrage_cluster()
+        self.average_cluster()
                 
         # Step 2: Generate a new partition by assigning each datapoint to its closest cluster center
         self.genrating_partition()
@@ -146,7 +138,7 @@ class KMeans:
         # Step 4: repeat until cluster membership stabilizes
         while not self.converging():
             epoch += 1
-            self.avrage_cluster()
+            self.average_cluster()
             self.genrating_partition()
 
         self.print_clusterPart(epoch)
@@ -175,7 +167,7 @@ class KMeans:
         total_hits = 0
 
         ## Iterate to get the clients and a data sample from the testdata
-        for client_idx, testSample in enumerate(self.testdata):
+        for testSample in self.testdata:
             ## closest cluster
             prototype = self.prototype_index(testSample)
             ## predicted values
