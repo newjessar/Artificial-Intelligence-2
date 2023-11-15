@@ -1,6 +1,6 @@
 # Artificial-Intelligence-2
 
-This project explores a diverse range of advanced topics in the field of machine learning and data analysis. The journey begins with a detailed look at the planning and strategic implementation of machine learning models, setting the stage for a deeper understanding of the processes involved.
+This project explores a diverse range of advanced topics in Artifical Intelligence related topics. The journey begins with a detailed look at the planning and strategic implementation of machine learning models, setting the stage for a deeper understanding of the processes involved.
 
 We then delve into the intriguing comparison between Symbolic and Statistical Learning, exploring their unique methodologies and applications. This comparison provides a holistic view of the different approaches used in machine learning and artificial intelligence.
 
